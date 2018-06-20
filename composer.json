@@ -1,0 +1,22 @@
+{
+  "name": "littlegiant/silverstripe-cms-image-dimensions",
+  "type": "silverstripe-vendormodule",
+  "authors": [
+    {
+      "name": "Harsh Chokshi",
+      "email": "harsh.chokshi@littlegiant.co.nz"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.1",
+    "silverstripe/framework": "^4.0",
+    "silverstripe/admin": "^1.0",
+    "silverstripe/asset-admin": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "LittleGiant\\CmsImageDimensions\\": "src/"
+    }
+  }
+}

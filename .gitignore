@@ -1,0 +1,10 @@
+vendor/
+composer.lock
+.env
+resources/
+silverstripe-cache
+.buildpath
+.project
+.settings
+.idea
+.DS_Store
