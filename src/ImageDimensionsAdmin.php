@@ -4,13 +4,17 @@ namespace LittleGiant\CmsImageDimensions;
 
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionProvider;
 
 /**
  * Class ImageDimensionsAdmin
  * @package LittleGiant\CmsImageDimensions
  */
-class ImageDimensionsAdmin extends LeftAndMain
+class ImageDimensionsAdmin extends LeftAndMain implements PermissionProvider
 {
+    const CMS_ACCESS = 'CMS_ACCESS_' . self::class;
+
     /**
      * @var string
      */
@@ -56,5 +60,18 @@ class ImageDimensionsAdmin extends LeftAndMain
     public function showConstraintEnforcement(): bool
     {
         return static::config()->get('show_constraint_enforcement');
+    }
+
+    /**
+     * @return array
+     */
+    public function providePermissions()
+    {
+        return [
+            self::CMS_ACCESS => [
+                'name' => 'View CMS image specifications',
+                'category' => _t(Permission::class . '.CMS_ACCESS_CATEGORY', 'CMS Access'),
+            ],
+        ];
     }
 }
