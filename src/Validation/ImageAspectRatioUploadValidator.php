@@ -10,6 +10,8 @@ use SilverStripe\Assets\Upload_Validator;
  */
 class ImageAspectRatioUploadValidator extends UploadValidator
 {
+    const ALLOWED_VARIATION = 0.001;
+
     /** @var int */
     protected $width;
 
@@ -67,6 +69,6 @@ class ImageAspectRatioUploadValidator extends UploadValidator
      */
     private function floatEquals(float $a, float $b): bool
     {
-        return abs($a - $b) <= abs(($a - $b) / $b);
+        return abs($a - $b) <= static::ALLOWED_VARIATION;
     }
 }

@@ -61,6 +61,6 @@ class ImageDimensionsProvider
             $dimensions[$identifier] = ImageDimensions::fromYaml($identifier, $data, $defaultAllowedExtensions);
         }
 
-        return new ArrayList($dimensions);
+        return ArrayList::create($dimensions);
     }
 }

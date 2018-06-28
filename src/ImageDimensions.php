@@ -91,7 +91,7 @@ class ImageDimensions extends ViewableData
 
         [$aspectRatioWidth, $aspectRatioHeight] = explode(':', $data['aspect_ratio'] ?? '0:0');
 
-        return new self(
+        return static::create(
             $identifier,
             $data['name'] ?? $identifier,
             $data['allowed_extensions'] ?? $defaultAllowedExtensions,
@@ -114,11 +114,11 @@ class ImageDimensions extends ViewableData
         $field->setAllowedExtensions($this->allowedExtensions);
 
         if ($this->validateDimensions) {
-            $field->setValidator(new ImageDimensionsUploadValidator($this->width, $this->height, $field->getValidator()));
+            $field->setValidator(ImageDimensionsUploadValidator::create($this->width, $this->height, $field->getValidator()));
         }
 
         if ($this->validateAspectRatio) {
-            $field->setValidator(new ImageAspectRatioUploadValidator($this->aspectRatioWidth, $this->aspectRatioHeight, $field->getValidator()));
+            $field->setValidator(ImageAspectRatioUploadValidator::create($this->aspectRatioWidth, $this->aspectRatioHeight, $field->getValidator()));
         }
     }
 
