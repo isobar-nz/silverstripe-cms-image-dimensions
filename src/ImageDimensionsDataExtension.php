@@ -31,12 +31,33 @@ class ImageDimensionsDataExtension extends DataExtension
     /**
      * @inheritDoc
      */
-    public function updateCMSFields(FieldList $fields)
+    public function updateCMSFields(FieldList $f)
     {
-        /** @var \SilverStripe\Core\Config\Config_ForClass $config */
-        $config = $this->owner->config();
+        /** @var array $imageDimensions */
+        $imageDimensions = $this->owner->config()->get('image_dimensions');
 
-        foreach ($config->get('image_dimensions') as $fieldName => $identifier) {
+        /*
+         * This is done via reflection because afterExtending is protected, but the image field annotation can only
+         * work on extension-provided fields if it is done after all extension fields are added.
+         */
+        $afterExtending = new \ReflectionMethod($this->owner, 'afterExtending');
+        $afterExtending->setAccessible(true);
+
+        $afterExtending->invoke($this->owner, 'updateCMSFields',
+            function (FieldList $fields) use ($imageDimensions) {
+                $this->processImageDimensions($fields, $imageDimensions);
+            });
+
+        $afterExtending->setAccessible(false);
+    }
+
+    /**
+     * @param \SilverStripe\Forms\FieldList $fields
+     * @param array $imageDimensionsConfig
+     */
+    public function processImageDimensions(FieldList $fields, array $imageDimensionsConfig): void
+    {
+        foreach ($imageDimensionsConfig as $fieldName => $identifier) {
             $field = $fields->dataFieldByName($fieldName);
 
             if ($field instanceof UploadField) {
