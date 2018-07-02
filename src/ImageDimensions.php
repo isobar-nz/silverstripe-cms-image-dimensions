@@ -5,8 +5,6 @@ namespace LittleGiant\CmsImageDimensions;
 use LittleGiant\CmsImageDimensions\Validation\ImageAspectRatioUploadValidator;
 use LittleGiant\CmsImageDimensions\Validation\ImageDimensionsUploadValidator;
 use SilverStripe\AssetAdmin\Forms\UploadField;
-use SilverStripe\ORM\FieldType\DBBoolean;
-use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\View\ViewableData;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
@@ -16,6 +14,15 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 class ImageDimensions extends ViewableData
 {
+    /**
+     * @var array
+     */
+    private static $casting = [
+        'DimensionsNice'      => 'HTMLFragment',
+        'ValidateDimensions'  => 'Boolean',
+        'ValidateAspectRatio' => 'Boolean',
+    ];
+
     /** @var string */
     private $identifier;
 
@@ -230,22 +237,22 @@ class ImageDimensions extends ViewableData
     {
         return ($this->aspectRatioWidth > 0 && $this->aspectRatioHeight > 0)
             ? "{$this->aspectRatioWidth}:{$this->aspectRatioHeight}"
-            : '';
+            : 'n/a';
     }
 
     /**
-     * @return \SilverStripe\ORM\FieldType\DBBoolean
+     * @return bool
      */
-    public function validateDimensions(): DBBoolean
+    public function validateDimensions(): bool
     {
-        return DBBoolean::create()->setValue($this->validateDimensions);
+        return $this->validateDimensions;
     }
 
     /**
-     * @return \SilverStripe\ORM\FieldType\DBBoolean
+     * @return bool
      */
-    public function validateAspectRatio(): DBBoolean
+    public function validateAspectRatio(): bool
     {
-        return DBBoolean::create()->setValue($this->validateAspectRatio);
+        return $this->validateAspectRatio;
     }
 }
