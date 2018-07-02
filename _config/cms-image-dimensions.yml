@@ -9,8 +9,8 @@ SilverStripe\ORM\DataObject:
 #    profile-picture: # identifier
 #      name: Profile Picture
 #      description: Member profile image.
-#      width: 128
-#      height: 128
+#      min_width: 128
+#      min_height: 128
 #      validate_dimensions: true
 #      aspect_ratio: 1:1 # square
 #      validate_aspect_ratio: true
