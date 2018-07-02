@@ -16,7 +16,7 @@
                 <td>Description</td>
                 <td>Allowed Extensions</td>
 
-                <td>Dimensions (W&times;H)</td>
+                <td>Min. Dimensions (W&times;H)</td>
                 <% if $ShowConstraintEnforcement %>
                     <td>Min. Dimensions Enforced</td>
                 <% end_if %>
