@@ -51,7 +51,7 @@ class ImageDimensionsAdmin extends LeftAndMain implements PermissionProvider
      */
     public function getImageDefinitions(): ArrayList
     {
-        return $this->imageDimensionsProvider->getAll();
+        return $this->imageDimensionsProvider->getAll()->sort('Name');
     }
 
     /**
