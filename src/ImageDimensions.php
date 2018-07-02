@@ -29,10 +29,10 @@ class ImageDimensions extends ViewableData
     private $allowedExtensions;
 
     /** @var int */
-    private $width;
+    private $minWidth;
 
     /** @var int */
-    private $height;
+    private $minHeight;
 
     /** @var bool */
     private $validateDimensions;
@@ -51,15 +51,15 @@ class ImageDimensions extends ViewableData
      * @param string $identifier
      * @param string $name
      * @param array $allowedExtensions
-     * @param int $width
-     * @param int $height
+     * @param int $minWidth
+     * @param int $minHeight
      * @param string $description
      * @param bool $validateDimensions
      * @param bool $validateAspectRatio
      * @param int $aspectRatioWidth
      * @param int $aspectRatioHeight
      */
-    public function __construct(string $identifier, string $name, array $allowedExtensions, int $width, int $height,
+    public function __construct(string $identifier, string $name, array $allowedExtensions, int $minWidth, int $minHeight,
                                 string $description = '', bool $validateDimensions = true, bool $validateAspectRatio = false,
                                 int $aspectRatioWidth = 0, int $aspectRatioHeight = 0)
     {
@@ -68,8 +68,8 @@ class ImageDimensions extends ViewableData
         $this->description = $description;
         $this->allowedExtensions = $allowedExtensions;
 
-        $this->width = $width;
-        $this->height = $height;
+        $this->minWidth = $minWidth;
+        $this->minHeight = $minHeight;
         $this->validateDimensions = $validateDimensions;
 
         $this->aspectRatioWidth = $aspectRatioWidth;
@@ -85,8 +85,8 @@ class ImageDimensions extends ViewableData
      */
     public static function fromYaml(string $identifier, array $data, array $defaultAllowedExtensions): self
     {
-        if (!isset($data['width'], $data['height'])) {
-            throw new InvalidConfigurationException("Image dimensions with identifier '{$identifier}' must have required parameters 'width' and 'height'.");
+        if (!isset($data['min_width'], $data['min_height'])) {
+            throw new InvalidConfigurationException("Image dimensions with identifier '{$identifier}' must have required parameters 'min_width' and 'min_height'.");
         }
 
         [$aspectRatioWidth, $aspectRatioHeight] = explode(':', $data['aspect_ratio'] ?? '0:0');
@@ -95,8 +95,8 @@ class ImageDimensions extends ViewableData
             $identifier,
             $data['name'] ?? $identifier,
             $data['allowed_extensions'] ?? $defaultAllowedExtensions,
-            $data['width'],
-            $data['height'],
+            $data['min_width'],
+            $data['min_height'],
             $data['description'] ?? '',
             $data['validate_dimensions'] ?? true,
             $data['validate_aspect_ratio'] ?? false,
@@ -114,7 +114,7 @@ class ImageDimensions extends ViewableData
         $field->setAllowedExtensions($this->allowedExtensions);
 
         if ($this->validateDimensions) {
-            $field->setValidator(ImageDimensionsUploadValidator::create($this->width, $this->height, $field->getValidator()));
+            $field->setValidator(ImageDimensionsUploadValidator::create($this->minWidth, $this->minHeight, $field->getValidator()));
         }
 
         if ($this->validateAspectRatio) {
@@ -127,20 +127,20 @@ class ImageDimensions extends ViewableData
      */
     private function getUploadFieldRightText(): string
     {
-        $text = '{description} The dimensions of the image should be {width}px wide by {height}px high.';
+        $text = '{description} The dimensions of the image should be at least {min_width}px wide and at least {min_height}px high.';
 
         if ($this->aspectRatioWidth > 0 && $this->aspectRatioHeight > 0) {
             $text .= ' The aspect ratio should be {aspect_width}:{aspect_height}.';
         }
 
         return _t(static::class . '.CMS_UPLOAD_RIGHT_TEXT', "{$text} The allowed extensions are: {allowed_extensions}.", [
-                'description'        => $this->description,
-                'allowed_extensions' => $this->getAllowedExtensionsNice(),
-                'width'              => $this->width,
-                'height'             => $this->height,
-                'aspect_width'        => $this->aspectRatioWidth,
-                'aspect_height'       => $this->aspectRatioHeight,
-            ]);
+            'description'        => $this->description,
+            'allowed_extensions' => $this->getAllowedExtensionsNice(),
+            'min_width'          => $this->minWidth,
+            'min_height'         => $this->minHeight,
+            'aspect_width'       => $this->aspectRatioWidth,
+            'aspect_height'      => $this->aspectRatioHeight,
+        ]);
     }
 
     /**
@@ -170,25 +170,25 @@ class ImageDimensions extends ViewableData
     /**
      * @return int
      */
-    public function getWidth(): int
+    public function getMinWidth(): int
     {
-        return $this->width;
+        return $this->minWidth;
     }
 
     /**
      * @return int
      */
-    public function getHeight(): int
+    public function getMinHeight(): int
     {
-        return $this->height;
+        return $this->minHeight;
     }
 
     /**
-     * @return \SilverStripe\ORM\FieldType\DBHTMLText
+     * @return string
      */
-    public function getDimensionsNice(): DBHTMLText
+    public function getDimensionsNice(): string
     {
-        return DBHTMLText::create()->setValue("{$this->width}&times;{$this->height}px");
+        return "{$this->minWidth}&times;{$this->minHeight}px";
     }
 
     /**
