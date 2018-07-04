@@ -14,3 +14,4 @@ SilverStripe\ORM\DataObject:
 #      validate_dimensions: true
 #      aspect_ratio: 1:1 # square
 #      validate_aspect_ratio: true
+#      max_size_kb: 1024

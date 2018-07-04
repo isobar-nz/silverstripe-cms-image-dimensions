@@ -41,6 +41,9 @@ class ImageDimensions extends ViewableData
     /** @var int */
     private $minHeight;
 
+    /** @var int */
+    private $maxSize;
+
     /** @var bool */
     private $validateDimensions;
 
@@ -61,18 +64,20 @@ class ImageDimensions extends ViewableData
      * @param int $minWidth
      * @param int $minHeight
      * @param string $description
+     * @param int $maxSize Maximum allowed file size in KB, or 0 for unlimited.
      * @param bool $validateDimensions
      * @param bool $validateAspectRatio
      * @param int $aspectRatioWidth
      * @param int $aspectRatioHeight
      */
     public function __construct(string $identifier, string $name, array $allowedExtensions, int $minWidth, int $minHeight,
-                                string $description = '', bool $validateDimensions = true, bool $validateAspectRatio = false,
-                                int $aspectRatioWidth = 0, int $aspectRatioHeight = 0)
+                                string $description = '', int $maxSize = 0, bool $validateDimensions = true,
+                                bool $validateAspectRatio = false, int $aspectRatioWidth = 0, int $aspectRatioHeight = 0)
     {
         $this->identifier = $identifier;
         $this->name = $name;
         $this->description = $description;
+        $this->maxSize = $maxSize;
         $this->allowedExtensions = $allowedExtensions;
 
         $this->minWidth = $minWidth;
@@ -105,6 +110,7 @@ class ImageDimensions extends ViewableData
             $data['min_width'],
             $data['min_height'],
             $data['description'] ?? '',
+            $data['max_size_kb'] ?? 0,
             $data['validate_dimensions'] ?? true,
             $data['validate_aspect_ratio'] ?? false,
             $aspectRatioWidth,
@@ -119,6 +125,15 @@ class ImageDimensions extends ViewableData
     {
         $field->setRightTitle($this->getUploadFieldRightText());
         $field->setAllowedExtensions($this->allowedExtensions);
+
+        if ($this->maxSize > 0) {
+            /** @var \SilverStripe\Assets\Upload_Validator $validator */
+            $validator = $field->getValidator();
+            $validator->setAllowedMaxFileSize([
+                // Set max file size for all file types. Multiply from KiB to bytes.
+                '*' => $this->maxSize * 1024,
+            ]);
+        }
 
         if ($this->validateDimensions) {
             $field->setValidator(ImageDimensionsUploadValidator::create($this->minWidth, $this->minHeight, $field->getValidator()));
@@ -140,6 +155,10 @@ class ImageDimensions extends ViewableData
             $text .= ' The aspect ratio should be {aspect_width}:{aspect_height}.';
         }
 
+        if ($this->maxSize > 0) {
+            $text .= ' The file size should be no more than {max_size}KB.';
+        }
+
         return _t(static::class . '.CMS_UPLOAD_RIGHT_TEXT', "{$text} The allowed extensions are: {allowed_extensions}.", [
             'description'        => $this->description,
             'allowed_extensions' => $this->getAllowedExtensionsNice(),
@@ -147,6 +166,7 @@ class ImageDimensions extends ViewableData
             'min_height'         => $this->minHeight,
             'aspect_width'       => $this->aspectRatioWidth,
             'aspect_height'      => $this->aspectRatioHeight,
+            'max_size'           => number_format($this->maxSize),
         ]);
     }
 
@@ -204,6 +224,14 @@ class ImageDimensions extends ViewableData
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxSize(): int
+    {
+        return $this->maxSize;
     }
 
     /**
