@@ -26,12 +26,18 @@ class ImageDimensionsProvider
      * @config
      * @var string[]
      */
-    private static $default_allowed_extensions = [
+    private static $allowed_extensions = [
         'png',
         'jpg',
         'gif',
         'webp',
     ];
+
+    /**
+     * @config
+     * @var int
+     */
+    private static $max_size_kb;
 
     /**
      * @param string $identifier
@@ -45,8 +51,20 @@ class ImageDimensionsProvider
             throw new InvalidConfigurationException("There are no image dimensions defined with identifier '{$identifier}'.");
         }
 
-        return ImageDimensions::fromYaml($identifier, $definitions[$identifier],
-            static::config()->get('default_allowed_extensions'));
+        return ImageDimensions::fromYaml($identifier, $definitions[$identifier], static::getDefaultSettings());
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultSettings(): array
+    {
+        $config = static::config();
+
+        return [
+            'allowed_extensions' => $config->get('allowed_extensions'),
+            'max_size_kb'        => $config->get('max_size_kb'),
+        ];
     }
 
     /**
@@ -54,11 +72,11 @@ class ImageDimensionsProvider
      */
     public function getAll(): ArrayList
     {
-        $defaultAllowedExtensions = static::config()->get('default_allowed_extensions');
+        $defaults = static::getDefaultSettings();
         $dimensions = [];
 
         foreach (static::config()->get('definitions') as $identifier => $data) {
-            $dimensions[$identifier] = ImageDimensions::fromYaml($identifier, $data, $defaultAllowedExtensions);
+            $dimensions[$identifier] = ImageDimensions::fromYaml($identifier, $data, $defaults);
         }
 
         return ArrayList::create($dimensions);

@@ -92,10 +92,10 @@ class ImageDimensions extends ViewableData
     /**
      * @param string $identifier
      * @param array $data
-     * @param array $defaultAllowedExtensions
+     * @param array $defaults
      * @return \LittleGiant\CmsImageDimensions\ImageDimensions
      */
-    public static function fromYaml(string $identifier, array $data, array $defaultAllowedExtensions): self
+    public static function fromYaml(string $identifier, array $data, array $defaults): self
     {
         if (!isset($data['min_width'], $data['min_height'])) {
             throw new InvalidConfigurationException("Image dimensions with identifier '{$identifier}' must have required parameters 'min_width' and 'min_height'.");
@@ -106,11 +106,11 @@ class ImageDimensions extends ViewableData
         return static::create(
             $identifier,
             $data['name'] ?? $identifier,
-            $data['allowed_extensions'] ?? $defaultAllowedExtensions,
+            $data['allowed_extensions'] ?? $defaults['allowed_extensions'],
             $data['min_width'],
             $data['min_height'],
             $data['description'] ?? '',
-            $data['max_size_kb'] ?? 0,
+            $data['max_size_kb'] ?? $defaults['max_size_kb'] ?? 0,
             $data['validate_dimensions'] ?? true,
             $data['validate_aspect_ratio'] ?? false,
             $aspectRatioWidth,
