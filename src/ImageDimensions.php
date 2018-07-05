@@ -5,6 +5,8 @@ namespace LittleGiant\CmsImageDimensions;
 use LittleGiant\CmsImageDimensions\Validation\ImageAspectRatioUploadValidator;
 use LittleGiant\CmsImageDimensions\Validation\ImageDimensionsUploadValidator;
 use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Assets\File;
+use SilverStripe\Core\Convert;
 use SilverStripe\View\ViewableData;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
@@ -64,7 +66,7 @@ class ImageDimensions extends ViewableData
      * @param int $minWidth
      * @param int $minHeight
      * @param string $description
-     * @param int $maxSize Maximum allowed file size in KB, or 0 for unlimited.
+     * @param int $maxSize Maximum allowed file size in bytes, or 0 for unlimited.
      * @param bool $validateDimensions
      * @param bool $validateAspectRatio
      * @param int $aspectRatioWidth
@@ -103,6 +105,12 @@ class ImageDimensions extends ViewableData
 
         [$aspectRatioWidth, $aspectRatioHeight] = explode(':', $data['aspect_ratio'] ?? '0:0');
 
+        $maxSize = $data['max_size'] ?? $defaults['max_size'] ?? 0;
+        if (is_string($maxSize)) {
+            // Handle INI format values
+            $maxSize = Convert::memstring2bytes($maxSize);
+        }
+
         return static::create(
             $identifier,
             $data['name'] ?? $identifier,
@@ -110,7 +118,7 @@ class ImageDimensions extends ViewableData
             $data['min_width'],
             $data['min_height'],
             $data['description'] ?? '',
-            $data['max_size_kb'] ?? $defaults['max_size_kb'] ?? 0,
+            $maxSize,
             $data['validate_dimensions'] ?? true,
             $data['validate_aspect_ratio'] ?? false,
             $aspectRatioWidth,
@@ -131,7 +139,7 @@ class ImageDimensions extends ViewableData
             $validator = $field->getValidator();
             $validator->setAllowedMaxFileSize([
                 // Set max file size for all file types. Multiply from KiB to bytes.
-                '*' => $this->maxSize * 1024,
+                '*' => $this->maxSize,
             ]);
         }
 
@@ -156,7 +164,7 @@ class ImageDimensions extends ViewableData
         }
 
         if ($this->maxSize > 0) {
-            $text .= ' The file size should be no more than {max_size}KB.';
+            $text .= ' The file size should be no more than {max_size}.';
         }
 
         return _t(static::class . '.CMS_UPLOAD_RIGHT_TEXT', "{$text} The allowed extensions are: {allowed_extensions}.", [
@@ -166,7 +174,7 @@ class ImageDimensions extends ViewableData
             'min_height'         => $this->minHeight,
             'aspect_width'       => $this->aspectRatioWidth,
             'aspect_height'      => $this->aspectRatioHeight,
-            'max_size'           => number_format($this->maxSize),
+            'max_size'           => File::format_size($this->maxSize),
         ]);
     }
 
