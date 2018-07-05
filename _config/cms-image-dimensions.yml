@@ -5,6 +5,8 @@ SilverStripe\ORM\DataObject:
 # Example image dimension definition below
 
 #LittleGiant\CmsImageDimensions\ImageDimensionsProvider:
+#  max_size: 512K
+#
 #  definitions:
 #    profile-picture: # identifier
 #      name: Profile Picture
@@ -14,4 +16,4 @@ SilverStripe\ORM\DataObject:
 #      validate_dimensions: true
 #      aspect_ratio: 1:1 # square
 #      validate_aspect_ratio: true
-#      max_size_kb: 1024
+#      max_size: 1M # override default of 512KB to allow larger images

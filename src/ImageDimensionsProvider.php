@@ -37,7 +37,7 @@ class ImageDimensionsProvider
      * @config
      * @var int
      */
-    private static $max_size_kb;
+    private static $max_size;
 
     /**
      * @param string $identifier
@@ -63,7 +63,7 @@ class ImageDimensionsProvider
 
         return [
             'allowed_extensions' => $config->get('allowed_extensions'),
-            'max_size_kb'        => $config->get('max_size_kb'),
+            'max_size'           => $config->get('max_size'),
         ];
     }
 
