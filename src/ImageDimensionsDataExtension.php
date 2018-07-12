@@ -60,17 +60,18 @@ class ImageDimensionsDataExtension extends DataExtension
             $field = $fields->dataFieldByName($fieldName);
 
             if ($field instanceof UploadField) {
-                $identifier = $owner->resolveImageDefinition($identifier);
+                $identifier = $owner->resolveImageDefinition($fieldName, $identifier);
                 $this->imageDimensionsProvider->get($identifier)->updateUploadField($field);
             }
         }
     }
 
     /**
+     * @param string $fieldName
      * @param string $rawIdentifier
      * @return string
      */
-    public function resolveImageDefinition(string $rawIdentifier): string
+    public function resolveImageDefinition(string $fieldName, string $rawIdentifier): string
     {
         return $rawIdentifier;
     }
