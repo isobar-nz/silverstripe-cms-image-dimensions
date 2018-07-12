@@ -39,6 +39,11 @@ class ImageDimensionsUploadValidator extends UploadValidator
             return false;
         }
 
+        if (strpos($this->tmpFile['type'], 'image/svg') !== false) {
+            // SVG means dimensions are not an issue
+            return true;
+        }
+
         $imageSize = getimagesize($this->tmpFile['tmp_name']);
         if ($imageSize === false) {
             $this->addError(UploadValidator::class, 'DIMENSIONS_UNAVAILABLE', 'The dimensions of your image could not be determined.');
