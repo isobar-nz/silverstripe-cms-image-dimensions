@@ -41,7 +41,9 @@ class ImageAspectRatioUploadValidator extends UploadValidator
             return false;
         }
 
-        $imageSize = getimagesize($this->tmpFile['tmp_name']);
+        $isSvg = strpos($this->tmpFile['type'], 'image/svg') !== false;
+        $imageSize = $isSvg ? $this->getSvgDimensions($this->tmpFile['tmp_name']) : getimagesize($this->tmpFile['tmp_name']);
+
         if ($imageSize === false) {
             $this->addError(UploadValidator::class, 'DIMENSIONS_UNAVAILABLE', 'The dimensions of your image could not be determined.');
             return false;
@@ -63,11 +65,42 @@ class ImageAspectRatioUploadValidator extends UploadValidator
     }
 
     /**
+     * Try extract the dimensions of an SVG from the viewbox, falling back to the width/height attributes.
+     * @see getimagesize()
+     * @param string $path
+     * @return array|false Array of [width, height] or false on failure. This is to maintain return type compatibility
+     *                     with getimagesize()
+     */
+    protected function getSvgDimensions(string $path)
+    {
+        $svgXml = simplexml_load_file($path);
+        $attributes = $svgXml->attributes();
+
+        if ($attributes->viewBox) {
+            // viewBox="xmin ymin width height"
+            $viewBox = explode(' ', $attributes->viewBox);
+
+            $width = $viewBox[2];
+            $height = $viewBox[3];
+        } else {
+            $width = $attributes->width;
+            $height = $attributes->height;
+        }
+
+        return ($width && $height)
+            ? [
+                floatval($width),
+                floatval($height),
+            ]
+            : false;
+    }
+
+    /**
      * @param float $a
      * @param float $b
      * @return bool
      */
-    private function floatEquals(float $a, float $b): bool
+    protected function floatEquals(float $a, float $b): bool
     {
         return abs($a - $b) <= static::ALLOWED_VARIATION;
     }
