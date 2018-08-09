@@ -40,6 +40,18 @@ class ImageDimensionsProvider
     private static $max_size;
 
     /**
+     * @config
+     * @var bool
+     */
+    private static $validate_dimensions = true;
+
+    /**
+     * @config
+     * @var bool
+     */
+    private static $validate_aspect_ratio = true;
+
+    /**
      * @param string $identifier
      * @return \LittleGiant\CmsImageDimensions\ImageDimensions
      */
@@ -62,8 +74,10 @@ class ImageDimensionsProvider
         $config = static::config();
 
         return [
-            'allowed_extensions' => $config->get('allowed_extensions'),
-            'max_size'           => $config->get('max_size'),
+            'allowed_extensions'    => $config->get('allowed_extensions'),
+            'max_size'              => $config->get('max_size'),
+            'validate_aspect_ratio' => $config->get('validate_aspect_ratio'),
+            'validate_dimensions'   => $config->get('validate_dimensions'),
         ];
     }
 
