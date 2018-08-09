@@ -103,24 +103,31 @@ class ImageDimensions extends ViewableData
             throw new InvalidConfigurationException("Image dimensions with identifier '{$identifier}' must have required parameters 'min_width' and 'min_height'.");
         }
 
-        [$aspectRatioWidth, $aspectRatioHeight] = explode(':', $data['aspect_ratio'] ?? '0:0');
+        $data = array_merge([
+            'description'  => '',
+            'aspect_ratio' => '0:0',
+            'max_size'     => 0,
+            'name'         => $identifier,
+        ], $defaults, $data);
 
-        $maxSize = $data['max_size'] ?? $defaults['max_size'] ?? 0;
+        $maxSize = $data['max_size'];
         if (is_string($maxSize)) {
             // Handle INI format values
             $maxSize = Convert::memstring2bytes($maxSize);
         }
 
+        [$aspectRatioWidth, $aspectRatioHeight] = explode(':', $data['aspect_ratio']);
+
         return static::create(
             $identifier,
-            $data['name'] ?? $identifier,
-            $data['allowed_extensions'] ?? $defaults['allowed_extensions'],
+            $data['name'],
+            $data['allowed_extensions'],
             $data['min_width'],
             $data['min_height'],
-            $data['description'] ?? '',
+            $data['description'],
             $maxSize,
-            $data['validate_dimensions'] ?? true,
-            $data['validate_aspect_ratio'] ?? false,
+            $data['validate_dimensions'],
+            $data['validate_aspect_ratio'],
             $aspectRatioWidth,
             $aspectRatioHeight
         );
