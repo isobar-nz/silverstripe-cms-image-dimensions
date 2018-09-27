@@ -73,13 +73,13 @@ class ImageDimensions extends ViewableData
      * @param int $aspectRatioHeight
      */
     public function __construct(string $identifier, string $name, array $allowedExtensions, int $minWidth, int $minHeight,
-                                string $description = '', int $maxSize = 0, bool $validateDimensions = true,
+                                string $description = '', ?int $maxSize = 0, bool $validateDimensions = true,
                                 bool $validateAspectRatio = false, int $aspectRatioWidth = 0, int $aspectRatioHeight = 0)
     {
         $this->identifier = $identifier;
         $this->name = $name;
         $this->description = $description;
-        $this->maxSize = $maxSize;
+        $this->maxSize = $maxSize ?? 0;
         $this->allowedExtensions = $allowedExtensions;
 
         $this->minWidth = $minWidth;
