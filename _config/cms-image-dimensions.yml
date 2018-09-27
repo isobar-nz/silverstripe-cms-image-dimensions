@@ -1,3 +1,6 @@
+---
+Name: cms-image-dimensions
+---
 SilverStripe\ORM\DataObject:
   extensions:
     - LittleGiant\CmsImageDimensions\ImageDimensionsDataExtension
